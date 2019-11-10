@@ -3,7 +3,7 @@ import {CommonModule} from '@angular/common';
 import {MatButtonModule} from '@angular/material/button';
 import {MatMenuModule} from '@angular/material/menu';
 import {RouterModule} from '@angular/router';
-import {ThemePickerModule} from '../theme-picker/theme-picker';
+import {ThemePickerModule} from '../theme-picker';
 import {VersionPickerModule} from '../version-picker';
 import {SECTIONS} from '../documentation-items/documentation-items';
 
