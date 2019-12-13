@@ -21,13 +21,14 @@ export class StackBlitzButton {
    * StackBlitz not yet being ready for people with poor network connections or slow devices.
    */
   isDisabled = false;
-  stackBlitzForm: HTMLFormElement;
+  stackBlitzForm: HTMLFormElement | undefined;
 
   @Input()
-  set example(example: string) {
-    const exampleData = new ExampleData(example);
+  set example(example: string | undefined) {
+    let exampleData;
 
     if (example) {
+      exampleData = new ExampleData(example);
       this.stackBlitzWriter.constructStackBlitzForm(exampleData)
       .then((stackBlitzForm: HTMLFormElement) => {
         this.stackBlitzForm = stackBlitzForm;
@@ -45,9 +46,11 @@ export class StackBlitzButton {
     // to submit if it is detached from the document. See the following chromium commit for
     // more details:
     // https://chromium.googlesource.com/chromium/src/+/962c2a22ddc474255c776aefc7abeba00edc7470%5E!
-    document.body.appendChild(this.stackBlitzForm);
-    this.stackBlitzForm.submit();
-    document.body.removeChild(this.stackBlitzForm);
+    if (this.stackBlitzForm) {
+      document.body.appendChild(this.stackBlitzForm);
+      this.stackBlitzForm.submit();
+      document.body.removeChild(this.stackBlitzForm);
+    }
   }
 }
 

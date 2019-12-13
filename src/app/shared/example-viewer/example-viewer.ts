@@ -15,13 +15,13 @@ const fileExtensionRegex = /(.*)\.(\w+)/;
 })
 export class ExampleViewer {
   /** Component portal for the currently displayed example. */
-  selectedPortal: ComponentPortal<any>;
+  selectedPortal: ComponentPortal<any> | undefined;
 
   /** Map of example files that should be displayed in the view-source tab. */
-  exampleTabs: {[tabName: string]: string};
+  exampleTabs: {[tabName: string]: string} | undefined;
 
   /** Data for the currently selected example. */
-  exampleData: LiveExample;
+  exampleData: LiveExample | undefined;
 
   /** Whether the source for the example is being displayed. */
   showSource = false;
@@ -29,7 +29,7 @@ export class ExampleViewer {
   /** String key of the currently displayed example. */
   @Input()
   get example() { return this._example; }
-  set example(exampleName: string) {
+  set example(exampleName: string | undefined) {
     if (exampleName && EXAMPLE_COMPONENTS[exampleName]) {
       this._example = exampleName;
       this.exampleData = EXAMPLE_COMPONENTS[exampleName];
@@ -39,7 +39,7 @@ export class ExampleViewer {
       console.error(`Could not find example: ${exampleName}`);
     }
   }
-  private _example: string;
+  private _example: string | undefined;
 
   constructor(private snackbar: MatSnackBar, private copier: CopierService) {}
 
@@ -55,8 +55,8 @@ export class ExampleViewer {
     }
   }
 
-  _getExampleTabNames() {
-    return Object.keys(this.exampleTabs);
+  _getExampleTabNames(): string[] {
+    return this.exampleTabs ? Object.keys(this.exampleTabs) : [];
   }
 
   private resolveHighlightedExampleFile(fileName: string) {
@@ -70,13 +70,17 @@ export class ExampleViewer {
       CSS: this.resolveHighlightedExampleFile(`${this.example}-example-css.html`),
     };
 
-    const additionalFiles = this.exampleData.additionalFiles || [];
+    const additionalFiles = this.exampleData && this.exampleData.additionalFiles
+                                ? this.exampleData.additionalFiles
+                                : [];
 
     additionalFiles.forEach(fileName => {
       // Since the additional files refer to the original file name, we need to transform
       // the file name to match the highlighted HTML file that displays the source.
       const fileSourceName = fileName.replace(fileExtensionRegex, '$1-$2.html');
-      this.exampleTabs[fileName] = this.resolveHighlightedExampleFile(fileSourceName);
+      if (this.exampleTabs) {
+        this.exampleTabs[fileName] = this.resolveHighlightedExampleFile(fileSourceName);
+      }
     });
   }
 }

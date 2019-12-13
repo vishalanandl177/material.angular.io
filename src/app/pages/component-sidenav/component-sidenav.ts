@@ -1,5 +1,14 @@
 import {
-  Component, Input, NgZone, ViewEncapsulation, ViewChild, OnInit, NgModule, OnDestroy
+  Component,
+  Input,
+  NgModule,
+  NgZone,
+  OnChanges,
+  OnDestroy,
+  OnInit,
+  SimpleChanges,
+  ViewChild,
+  ViewEncapsulation
 } from '@angular/core';
 import {DocumentationItems} from '../../shared/documentation-items/documentation-items';
 import {MatIconModule} from '@angular/material/icon';
@@ -9,9 +18,9 @@ import {ActivatedRoute, Params, Router, RouterModule} from '@angular/router';
 import {CommonModule} from '@angular/common';
 import {ComponentHeaderModule} from '../component-page-header/component-page-header';
 import {FooterModule} from '../../shared/footer/footer';
-import {Observable, Subject, combineLatest} from 'rxjs';
-import {switchMap, takeUntil, startWith, map} from 'rxjs/operators';
-import {trigger, animate, state, style, transition} from '@angular/animations';
+import {combineLatest, Observable, Subject} from 'rxjs';
+import {map, takeUntil} from 'rxjs/operators';
+import {animate, state, style, transition, trigger} from '@angular/animations';
 import {CdkAccordionModule} from '@angular/cdk/accordion';
 import {BreakpointObserver} from '@angular/cdk/layout';
 
@@ -24,8 +33,8 @@ const SMALL_WIDTH_BREAKPOINT = 720;
   encapsulation: ViewEncapsulation.None,
 })
 export class ComponentSidenav implements OnInit {
-  @ViewChild(MatSidenav) sidenav: MatSidenav;
-  params: Observable<Params>;
+  @ViewChild(MatSidenav) sidenav!: MatSidenav;
+  params: Observable<Params> | undefined;
   isScreenSmall: Observable<boolean>;
 
   constructor(public docItems: DocumentationItems,
@@ -55,26 +64,35 @@ export class ComponentSidenav implements OnInit {
     ]),
   ],
 })
-export class ComponentNav implements OnInit, OnDestroy {
-
-  @Input() params: Observable<Params>;
+export class ComponentNav implements OnInit, OnDestroy, OnChanges {
+  @Input() params: Observable<Params> | undefined;
   expansions: {[key: string]: boolean} = {};
-  private _onDestroy = new Subject<void>();
+  private _destroyed = new Subject();
 
-  constructor(public docItems: DocumentationItems,
-              private _router: Router) { }
+  constructor(public docItems: DocumentationItems, private _router: Router) {}
 
   ngOnInit() {
-    this._router.events.pipe(
-      startWith(null),
-      switchMap(() => this.params),
-      takeUntil(this._onDestroy)
-    ).subscribe(p => this.setExpansions(p));
+    if (this.params) {
+      this.subscribeToParamChanges(this.params);
+    }
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes.params && changes.params.currentValue &&
+        (changes.params.currentValue != changes.params.previousValue)) {
+      this.subscribeToParamChanges(
+          (changes.params.currentValue as Observable<Params>));
+    }
+  }
+
+  subscribeToParamChanges(newParams: Observable<Params>) {
+    newParams.pipe(takeUntil(this._destroyed))
+        .subscribe(params => this.setExpansions(params));
   }
 
   ngOnDestroy() {
-    this._onDestroy.next();
-    this._onDestroy.complete();
+    this._destroyed.next();
+    this._destroyed.complete();
   }
 
   /** Set the expansions based on the route url */
@@ -113,7 +131,6 @@ export class ComponentNav implements OnInit, OnDestroy {
   getExpanded(category: string): boolean {
     return this.expansions[category] === undefined ? true : this.expansions[category];
   }
-
 }
 
 

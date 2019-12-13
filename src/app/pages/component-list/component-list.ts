@@ -17,7 +17,7 @@ import {combineLatest} from 'rxjs';
 })
 export class ComponentList {
   category: DocCategory | undefined;
-  section: string;
+  section: string | undefined;
 
   constructor(public docItems: DocumentationItems,
               private _componentPageTitle: ComponentPageTitle,

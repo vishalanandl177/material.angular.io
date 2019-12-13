@@ -1,4 +1,4 @@
-import {ComponentPortal, DomPortalHost} from '@angular/cdk/portal';
+import {ComponentPortal, DomPortalOutlet} from '@angular/cdk/portal';
 import {HttpClient, HttpErrorResponse} from '@angular/common/http';
 import {DomSanitizer} from '@angular/platform-browser';
 import {
@@ -25,10 +25,9 @@ import {HeaderLink} from './header-link';
   template: 'Loading document...',
 })
 export class DocViewer implements OnDestroy {
-  private _portalHosts: DomPortalHost[] = [];
-  private _documentFetchSubscription: Subscription;
-
-  @Input() name: string;
+  private _portalHosts: DomPortalOutlet[] = [];
+  private _documentFetchSubscription!: Subscription;
+  @Input() name: string | undefined;
 
   /** The URL of the document to display. */
   @Input()
@@ -107,7 +106,7 @@ export class DocViewer implements OnDestroy {
 
     Array.prototype.slice.call(exampleElements).forEach((element: Element) => {
       let example = element.getAttribute(componentName);
-      let portalHost = new DomPortalHost(
+      let portalHost = new DomPortalOutlet(
           element, this._componentFactoryResolver, this._appRef, this._injector);
       let examplePortal = new ComponentPortal(componentClass, this._viewContainerRef);
       let exampleViewer = portalHost.attach(examplePortal);

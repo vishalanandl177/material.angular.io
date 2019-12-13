@@ -10,7 +10,7 @@ import {environment} from '../../../environments/environment';
  */
 export class GaService {
 
-  private previousUrl: string;
+  private previousUrl: string | undefined;
 
   constructor() {
     this.ga('create', environment['matGaId'] , 'auto', 'mat');

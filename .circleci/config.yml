@@ -12,7 +12,7 @@ var_4: &save_cache
   save_cache:
     key: *cache_key
     paths:
-    - "node_modules"
+    - "node_modules/"
 
 var_5: &yarn_install
   run:

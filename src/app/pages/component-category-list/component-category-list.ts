@@ -5,8 +5,8 @@ import {ActivatedRoute, Params, RouterModule} from '@angular/router';
 import {DocumentationItems, SECTIONS} from '../../shared/documentation-items/documentation-items';
 import {ComponentPageTitle} from '../page-title/page-title';
 import {SvgViewerModule} from '../../shared/svg-viewer/svg-viewer';
-import {Observable, combineLatest, Subscription} from 'rxjs';
-
+import {combineLatest, Observable, Subject} from 'rxjs';
+import {takeUntil} from 'rxjs/operators';
 
 @Component({
   selector: 'app-component-category-list',
@@ -14,9 +14,9 @@ import {Observable, combineLatest, Subscription} from 'rxjs';
   styleUrls: ['./component-category-list.scss']
 })
 export class ComponentCategoryList implements OnInit, OnDestroy {
-  params: Observable<Params>;
-  routeParamSubscription: Subscription;
-  _categoryListSummary: string;
+  params: Observable<Params> | undefined;
+  private _destroyed = new Subject();
+  _categoryListSummary: string | undefined;
 
   constructor(public docItems: DocumentationItems,
               public _componentPageTitle: ComponentPageTitle,
@@ -29,7 +29,7 @@ export class ComponentCategoryList implements OnInit, OnDestroy {
       Object.assign);
 
     // title on topbar navigation
-    this.routeParamSubscription = this.params.subscribe(params => {
+    this.params.pipe(takeUntil(this._destroyed)).subscribe(params => {
       const sectionName = params['section'];
       const section = SECTIONS[sectionName];
       this._componentPageTitle.title = section.name;
@@ -38,7 +38,8 @@ export class ComponentCategoryList implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
-    this.routeParamSubscription.unsubscribe();
+    this._destroyed.next();
+    this._destroyed.complete();
   }
 }
 

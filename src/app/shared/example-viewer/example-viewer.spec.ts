@@ -78,7 +78,7 @@ describe('ExampleViewer', () => {
 
     extensions.forEach(extension => {
       const expected = `${basePath}${exampleKey}-example-${extension}.html`;
-      const actual = component.exampleTabs[extension.toUpperCase()];
+      const actual = component.exampleTabs![extension.toUpperCase()];
 
       expect(actual).toEqual(expected);
     });

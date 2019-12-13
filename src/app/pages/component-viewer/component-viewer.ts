@@ -31,11 +31,9 @@ export class ComponentViewer implements OnDestroy {
   sections: Set<string> = new Set(['overview', 'api']);
   private _destroyed = new Subject();
 
-  constructor(_route: ActivatedRoute,
-              private router: Router,
+  constructor(_route: ActivatedRoute, private router: Router,
               public _componentPageTitle: ComponentPageTitle,
-              public docItems: DocumentationItems,
-              ) {
+              public docItems: DocumentationItems) {
     let routeAndParentParams = [_route.params];
     if (_route.parent) {
       routeAndParentParams.push(_route.parent.params);
@@ -73,12 +71,10 @@ export class ComponentViewer implements OnDestroy {
  */
 @Directive()
 export class ComponentBaseView implements OnInit, OnDestroy {
-  @ViewChild('initialFocusTarget') focusTarget: ElementRef;
-  @ViewChild('toc') tableOfContents: TableOfContents;
-
+  @ViewChild('initialFocusTarget') focusTarget!: ElementRef;
+  @ViewChild('toc') tableOfContents!: TableOfContents;
   showToc: Observable<boolean>;
-
-  destroyed = new Subject<void>();
+  private _destroyed = new Subject();
 
   constructor(public componentViewer: ComponentViewer, breakpointObserver: BreakpointObserver) {
     this.showToc = breakpointObserver.observe('(max-width: 1200px)')
@@ -86,7 +82,7 @@ export class ComponentBaseView implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    this.componentViewer.componentDocItem.pipe(takeUntil(this.destroyed)).subscribe(() => {
+    this.componentViewer.componentDocItem.pipe(takeUntil(this._destroyed)).subscribe(() => {
       // 100ms timeout is used to allow the page to settle before moving focus for screen readers.
       setTimeout(() => this.focusTarget.nativeElement.focus({preventScroll: true}), 100);
       if (this.tableOfContents) {
@@ -96,7 +92,8 @@ export class ComponentBaseView implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
-    this.destroyed.next();
+    this._destroyed.next();
+    this._destroyed.complete();
   }
 
   updateTableOfContents(sectionName: string, docViewerContent: HTMLElement) {

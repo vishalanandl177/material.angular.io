@@ -28,7 +28,7 @@ import {map} from 'rxjs/operators';
 })
 export class ThemePicker implements OnInit, OnDestroy {
   private _queryParamSubscription = Subscription.EMPTY;
-  currentTheme: DocsSiteTheme;
+  currentTheme: DocsSiteTheme | undefined;
 
   themes: DocsSiteTheme[] = [
     {
