@@ -14,6 +14,7 @@ import {switchMap, takeUntil, startWith, map} from 'rxjs/operators';
 import {trigger, animate, state, style, transition} from '@angular/animations';
 import {CdkAccordionModule} from '@angular/cdk/accordion';
 import {BreakpointObserver} from '@angular/cdk/layout';
+import {MatListModule} from '@angular/material/list';
 
 const SMALL_WIDTH_BREAKPOINT = 720;
 
@@ -59,6 +60,7 @@ export class ComponentNav implements OnInit, OnDestroy {
 
   @Input() params: Observable<Params>;
   expansions: {[key: string]: boolean} = {};
+  currentItemId: string;
   private _onDestroy = new Subject<void>();
 
   constructor(public docItems: DocumentationItems,
@@ -69,7 +71,7 @@ export class ComponentNav implements OnInit, OnDestroy {
       startWith(null),
       switchMap(() => this.params),
       takeUntil(this._onDestroy)
-    ).subscribe(p => this.setExpansions(p));
+    ).subscribe(params => this.setExpansions(params));
   }
 
   ngOnDestroy() {
@@ -81,14 +83,12 @@ export class ComponentNav implements OnInit, OnDestroy {
   setExpansions(params: Params) {
     const categories = this.docItems.getCategories(params.section);
     for (const category of (categories || [])) {
-      if (this.expansions[category.id]) {
-        continue;
-      }
 
       let match = false;
       for (const item of category.items) {
         if (this._router.url.indexOf(item.id) > -1) {
           match = true;
+          this.currentItemId = item.id;
           break;
         }
       }
@@ -120,6 +120,7 @@ export class ComponentNav implements OnInit, OnDestroy {
 @NgModule({
   imports: [
     MatSidenavModule,
+    MatListModule,
     RouterModule,
     CommonModule,
     ComponentHeaderModule,
