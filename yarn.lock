@@ -187,8 +187,8 @@
   integrity sha512-kwX6475iuFEWcQc62mgd9Dq1lGMvqZXxEc0EZqsewi9Dpg/rj0ImXeYOTtIKFrgAkg03ahADBjtCComB0eKZgg==
 
 "@angular/components-examples@angular/material2-docs-content#master":
-  version "9.0.0-rc.6-sha-a30094b47"
-  resolved "https://codeload.github.com/angular/material2-docs-content/tar.gz/177ef7b8f91e3834e0749bdf48c02a9b870758c3"
+  version "9.0.0-rc.7-sha-a744dc31e"
+  resolved "https://codeload.github.com/angular/material2-docs-content/tar.gz/83d8f09a8b70c6a82c1d2c8104c9fc6718b34720"
 
 "@angular/core@^9.0.0-rc.7":
   version "9.0.0-rc.7"
